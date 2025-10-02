@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Neha Mahesh • Portfolio</title>
+  <meta name="description" content="Neha Mahesh — CS @ Purdue • Software Engineering, Data Engineering, Machine Learning." />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="#top">Neha Mahesh</a>
+      <div class="nav-right">
+        <a href="#projects">Projects</a>
+        <a href="#experience">Experience</a>
+        <a href="#skills">Skills</a>
+        <a href="#contact">Contact</a>
+        <button id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+      </div>
+    </nav>
+    <section class="hero" id="top">
+      <h1>Software Engineering • Data Engineering</h1>
+      <p class="tagline">
+        CS Sophomore @ Purdue. I build reliable, scalable software—multithreaded backends in Java,
+        data pipelines in Python/SQL, and API-driven web apps.
+      </p>
+      <div class="cta">
+        <a class="btn primary" href="assets/NehaMahesh_Resume.pdf" target="_blank" rel="noopener">Download Resume (PDF)</a>
+        <a class="btn" href="mailto:nmahesh@purdue.edu">Email Me</a>
+        <a class="btn" href="tel:+1-765-409-3676">Call</a>
+      </div>
+      <p class="mini">West Lafayette, IN • nmahesh@purdue.edu • (765) 409-3676</p>
+    </section>
+  </header>
+
+  <main>
+    <!-- PROJECTS -->
+    <section id="projects" class="section">
+      <h2>Projects</h2>
+      <div class="grid">
+        <article class="card">
+          <h3>ConnectSphere <span class="role">Team Lead & Lead Developer</span></h3>
+          <p class="tech">Java • OOP • Client-Server • Multithreading • MySQL</p>
+          <ul>
+            <li>Led a 4-person team to deliver a full social platform: auth, DMs, and real-time notifications.</li>
+            <li>Built a multithreaded server handling concurrent clients with thread-safe data synchronization.</li>
+            <li>Designed relational schema in MySQL and wrote efficient queries; enforced code quality with tests and Git.</li>
+          </ul>
+          <!-- Optional links: replace '#' with repo/demo later -->
+          <div class="links">
+            <a href="#" aria-disabled="true">Repo (soon)</a>
+            <a href="#" aria-disabled="true">Demo (soon)</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Personal Web Applications</h3>
+          <p class="tech">Python (Flask) • OpenWeather API • HTML/CSS/JS • Deploy</p>
+          <ul>
+            <li>Built a real-time Weather Dashboard (5-day forecast, °C/°F toggle) consuming OpenWeather API.</li>
+            <li>Created a responsive personal site to showcase projects and resume; deployed to Heroku/GitHub Pages.</li>
+            <li>Focused on clean UI/UX, accessibility, and clear documentation.</li>
+          </ul>
+          <div class="links">
+            <a href="#" aria-disabled="true">Repo (soon)</a>
+            <a href="#" aria-disabled="true">Live Site (this page)</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Expense Tracker</h3>
+          <p class="tech">Python • Tkinter • CSV • Data Viz</p>
+          <ul>
+            <li>Desktop app to log expenses, categorize spend, and export CSV.</li>
+            <li>Generated weekly/monthly summaries with simple charts for insights.</li>
+          </ul>
+          <div class="links">
+            <a href="#" aria-disabled="true">Repo (soon)</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section id="experience" class="section">
+      <h2>Experience</h2>
+
+      <div class="xp">
+        <div class="xp-head">
+          <h3>Software Engineering Intern — Data Engineering (Lincoln Financial Group)</h3>
+          <span class="date">Aug 2025 – Present • West Lafayette, IN</span>
+        </div>
+        <p class="sub">Purdue University <strong>Data Mine</strong> collaboration</p>
+        <ul>
+          <li>Built end-to-end Python pipelines for ingestion, transformation, and modeling of large financial datasets.</li>
+          <li>Implemented logistic-regression–based predictors for policy-lapse risk with tested, modular code.</li>
+          <li>Collaborated via Git/Jupyter; emphasized reliability, reusability, and clear documentation.</li>
+        </ul>
+      </div>
+
+      <div class="xp">
+        <div class="xp-head">
+          <h3>Summer Research Intern — IIT Madras</h3>
+          <span class="date">May 2025 – Aug 2025 • Chennai / Remote</span>
+        </div>
+        <p class="sub">Wi-Fi Sensing & Human Activity Recognition (HAR)</p>
+        <ul>
+          <li>Prototyped Python classification models for real-time gesture/motion detection from wireless signals.</li>
+          <li>Evaluated models across datasets; explored signal-processing features for robust recognition.</li>
+        </ul>
+      </div>
+
+      <div class="xp">
+        <div class="xp-head">
+          <h3>Research Intern — Polygence</h3>
+          <span class="date">2021 – 2023 • Remote</span>
+        </div>
+        <p class="sub">Computational modeling for chemotherapy-related free-radical toxicity</p>
+        <ul>
+          <li>Designed Python simulations and data pipelines (preprocessing + feature extraction) to study toxicity pathways.</li>
+          <li>Applied predictive modeling and visualization to generate CS-driven research insights.</li>
+        </ul>
+      </div>
+
+      <div class="xp">
+        <div class="xp-head">
+          <h3>Technology Consulting Virtual Experience — Deloitte</h3>
+          <span class="date">Jul 2024 • Remote</span>
+        </div>
+        <ul>
+          <li>Completed client-style EDA, data cleaning, and insights presentation; delivered actionable recommendations.</li>
+        </ul>
+      </div>
+
+      <div class="xp">
+        <div class="xp-head">
+          <h3>Girls Who Code (Purdue Chapter) — Chapter Member</h3>
+          <span class="date">Sep 2024 – Present • West Lafayette, IN</span>
+        </div>
+        <ul>
+          <li>Mentored students in Scratch/Python; led workshops to promote inclusion in CS.</li>
+        </ul>
+      </div>
+
+      <div class="xp">
+        <div class="xp-head">
+          <h3>Bhumi Foundation — Volunteer Technology Intern</h3>
+          <span class="date">2021 – 2022 • Remote</span>
+        </div>
+        <ul>
+          <li>Automated fundraising dashboards and reporting workflows to improve campaign monitoring.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills" class="section">
+      <h2>Skills</h2>
+      <div class="chips">
+        <span>Python</span><span>Java</span><span>C</span><span>SQL</span>
+        <span>OOP</span><span>Multithreading</span><span>Client-Server</span>
+        <span>Pandas</span><span>NumPy</span><span>scikit-learn</span>
+        <span>Flask</span><span>HTML/CSS/JS</span><span>MySQL</span><span>PostgreSQL</span>
+        <span>Git/GitHub</span><span>Data Pipelines / ETL</span><span>Data Viz</span>
+        <span>Problem Solving</span><span>Team Leadership</span>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section">
+      <h2>Contact</h2>
+      <p>Email: <a href="mailto:nmahesh@purdue.edu">nmahesh@purdue.edu</a> • Phone: <a href="tel:+1-765-409-3676">(765) 409-3676</a></p>
+      <p>LinkedIn: <a href="https://linkedin.com/in/neha-mahesh" target="_blank" rel="noopener">linkedin.com/in/neha-mahesh</a></p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="year"></span> Neha Mahesh • Built with HTML/CSS/JS • Hosted on GitHub Pages</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
