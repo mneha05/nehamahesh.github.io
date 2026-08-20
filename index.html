@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Neha Mahesh • Portfolio</title>
-  <meta name="description" content="Neha Mahesh — CS @ Purdue • Software Engineering, Data Engineering, Machine Learning." />
+  <title>Neha Mahesh — CUDA kernels, LLM inference, distributed systems</title>
+  <meta name="description" content="Neha Mahesh — CS @ Purdue. CUDA paged-attention kernels at 55% of a T4's peak bandwidth, a KV-cache-aware LLM serving scheduler, and distributed systems measured rather than guessed." />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
@@ -24,8 +24,9 @@
     <section class="hero" id="top">
       <h1>Software Engineering • Data Engineering</h1>
       <p class="tagline">
-        CS Sophomore @ Purdue. I build reliable, scalable software—multithreaded backends in Java,
-        data pipelines in Python/SQL, and API-driven web apps.
+        CS junior @ Purdue, Machine Intelligence track. I build systems close to the metal —
+        CUDA kernels, LLM inference schedulers, and distributed services — and I measure them
+        rather than guess.
       </p>
       <div class="cta">
         <a class="btn primary" href="assets/NehaMahesh_Resume.pdf" target="_blank" rel="noopener">Download Resume (PDF)</a>
@@ -41,6 +42,55 @@
     <section id="projects" class="section">
       <h2>Projects</h2>
       <div class="grid">
+        <article class="card featured">
+          <h3>hetero-serve <span class="fx-badge">Featured</span></h3>
+          <p class="tech">CUDA • C++ • WMMA / tensor cores • Nsight Compute • PyTorch • NumPy • paged attention • NCCL • asyncio • Docker</p>
+
+          <figure class="fx-media">
+            <img src="https://raw.githubusercontent.com/mneha05/hetero-serve/main/docs/hero.gif"
+                 alt="A shared KV-cache prefix fills on one accelerator, a second request reuses it instead of recomputing, then the cache crosses the interconnect to a second GPU"
+                 loading="lazy" width="820" height="292" />
+          </figure>
+          <p class="fx-cap">A prefix fills, the next request <em>reuses</em> it instead of recomputing, then the cache crosses the interconnect — <a href="https://mneha05.github.io/hetero-serve/">drive it yourself in the browser →</a></p>
+
+          <p>
+            A <strong>KV-cache-aware LLM serving scheduler</strong> with hand-written CUDA paged-attention kernels.
+            When a request shares a long prefix with an earlier one — a system prompt, a RAG document, an earlier
+            turn — its KV cache already exists, but often on the <em>wrong</em> accelerator. You can run it where the
+            cache is and wait behind a busy device, recompute the prefix, or drag the cache across the interconnect.
+            That third option is a bandwidth-versus-compute trade, and this system is built to find where it flips.
+          </p>
+
+          <div class="fx-stats">
+            <div class="fx-stat"><b>55.4%</b><span>of a Tesla T4's peak memory bandwidth</span></div>
+            <div class="fx-stat"><b>10–22×</b><span>faster than PyTorch SDPA on paged KV</span></div>
+            <div class="fx-stat"><b>3.60s → 1.94s</b><span>end-to-end p50 from cache-aware routing</span></div>
+            <div class="fx-stat"><b>101</b><span>tests, no mocks, real processes and sockets</span></div>
+          </div>
+
+          <ul>
+            <li><strong>Paged KV cache</strong> with 16-token blocks, refcounts, chain-hashed prefix sharing and LRU eviction; continuous batching with chunked prefill and recompute-preemption.</li>
+            <li><strong>A cost model that measures instead of assuming</strong> — it prices <em>stay</em> against <em>migrate</em> in seconds using per-device speeds probed at startup. Workers are real OS processes talking over real TCP through a token-bucket shaper, so concurrent transfers genuinely contend.</li>
+            <li><strong>Five CUDA kernels, each written in response to a measurement.</strong> Profiling showed a third of every decode step was the host gathering KV blocks into contiguous tensors — overhead invented by paging. v1 fuses that away; v2 adds FlashAttention-style online softmax; Nsight then showed v2 was <em>occupancy</em>-starved rather than bandwidth-starved (0.1 waves across 40 SMs), producing v3's context split — <strong>13.4% → 55.4% of peak</strong>.</li>
+            <li><strong>A prefill kernel and a tensor-core version</strong>, where a 16-token KV page is exactly one 16×16×16 WMMA fragment — which is why that block size was the right default before any kernel existed.</li>
+            <li><strong>Grouped-query attention moves the answer:</strong> Llama-3's 4:1 ratio shrinks the cache 4× and drops the migration crossover from <strong>503 Mbps to 126 Mbps</strong> — from needing a datacenter fabric to working on commodity networking.</li>
+            <li><strong>Five bugs documented, every one found by measuring</strong> rather than reading — including one where I was confident the cause was a serialisation layout, benchmarked it first, and was wrong.</li>
+          </ul>
+
+          <figure class="fx-media">
+            <img src="https://raw.githubusercontent.com/mneha05/hetero-serve/main/docs/architecture.png"
+                 alt="Architecture: a router control plane with a global prefix directory and migrate-vs-recompute cost model; three workers on CUDA, Intel Arc GPU and NPU each with a paged KV cache and continuous batching; a data plane carrying KV blocks over shaped TCP or NCCL; and the five CUDA kernels"
+                 loading="lazy" width="860" height="574" />
+          </figure>
+          <p class="fx-cap">The router decides <em>where</em>; each worker decides <em>when</em>.</p>
+
+          <div class="links">
+            <a class="btn primary" href="https://mneha05.github.io/hetero-serve/" target="_blank" rel="noopener">▶ Live demo</a>
+            <a class="btn" href="https://github.com/mneha05/hetero-serve" target="_blank" rel="noopener">GitHub</a>
+            <a class="btn" href="https://colab.research.google.com/github/mneha05/hetero-serve/blob/main/notebooks/verify_cuda_kernel.ipynb" target="_blank" rel="noopener">Compile the kernels (Colab)</a>
+          </div>
+        </article>
+
         <article class="card">
           <h3>ConnectSphere <span class="role">Team Lead & Lead Developer</span></h3>
           <p class="tech">Java • OOP • Client-Server • Multithreading • MySQL</p>
