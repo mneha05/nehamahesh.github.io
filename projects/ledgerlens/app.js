@@ -87,7 +87,124 @@ function decideApproval(id,approved){
       date:"Just now",amount:req.amount,receipt:false,status:"Approved request",cardholder:req.requester,policy:req.policy
     });
   }
-  saveState(); renderAll();
+  saveState(); 
+function analyzeSpendText(text){
+  const raw=text.trim();
+  const lower=raw.toLowerCase();
+  const amountMatch=raw.match(/\$\s*([0-9][0-9,]*(?:\.\d{1,2})?)/);
+  const amount=amountMatch?Number(amountMatch[1].replaceAll(",","")):null;
+
+  const merchantRules=[
+    ["United","United"],["Delta","Delta"],["Uber","Uber"],["Lyft","Lyft"],["Figma","Figma"],
+    ["Notion","Notion"],["GitHub","GitHub"],["AWS","AWS"],["Amazon","Amazon"],["OpenAI","OpenAI"]
+  ];
+  let merchant="Unspecified";
+  for(const [needle,name] of merchantRules){if(lower.includes(needle.toLowerCase())){merchant=name;break;}}
+
+  let category="Other";
+  if(/flight|airline|hotel|uber|lyft|travel|trip|nyc|boston|chicago|san francisco|sf\b/.test(lower)) category="Travel";
+  else if(/figma|notion|github|software|subscription|seat|license|saas/.test(lower)) category="Software";
+  else if(/aws|cloud|compute|server|gpu|hosting/.test(lower)) category="Cloud";
+  else if(/dinner|lunch|meal|coffee|restaurant|food/.test(lower)) category="Meals";
+
+  if(merchant==="Unspecified"){
+    const m=raw.match(/(?:at|from|for)\s+([A-Z][A-Za-z0-9&.-]*(?:\s+[A-Z][A-Za-z0-9&.-]*)?)/);
+    if(m) merchant=m[1];
+  }
+
+  const thresholds={Travel:700,Software:300,Cloud:1000,Meals:150,Other:250};
+  const threshold=thresholds[category]||250;
+  const receiptRequired=amount!==null ? amount>=75 : true;
+  const approvalRequired=amount===null ? true : amount>threshold;
+  const overBudget=amount!==null && spendTotal()+amount>state.budget;
+  const budgetAfter=amount!==null ? state.budget-(spendTotal()+amount) : state.budget-spendTotal();
+
+  const risk=[];
+  if(amount===null) risk.push("Amount missing");
+  if(approvalRequired) risk.push("Manager approval required");
+  if(receiptRequired) risk.push("Receipt required");
+  if(category==="Travel" && amount!==null && amount>700) risk.push("Travel exceeds auto-approve threshold");
+  if(category==="Meals" && amount!==null && amount>150) risk.push("Meal exceeds team policy threshold");
+  if(overBudget) risk.push("Would exceed monthly budget");
+
+  let recommendation="Auto-approve";
+  let tone="good";
+  if(overBudget){recommendation="Do not approve";tone="bad";}
+  else if(approvalRequired){recommendation="Route for approval";tone="warn";}
+
+  return {raw,amount,merchant,category,threshold,receiptRequired,approvalRequired,overBudget,budgetAfter,risk,recommendation,tone};
+}
+
+function renderCopilotResult(result){
+  const amountText=result.amount===null?"Amount needed":money(result.amount);
+  const riskHtml=result.risk.length?result.risk.map(x=>`<li>${escapeHtml(x)}</li>`).join(""):"<li>No policy issues detected</li>";
+  $("#copilotResult").innerHTML=`
+    <div class="result-status ${result.tone}">
+      <span>${result.tone==="good"?"✓":result.tone==="warn"?"!":"×"}</span>
+      <div><small>RECOMMENDATION</small><b>${escapeHtml(result.recommendation)}</b></div>
+    </div>
+    <div class="result-grid">
+      <div><small>Merchant</small><b>${escapeHtml(result.merchant)}</b></div>
+      <div><small>Amount</small><b>${amountText}</b></div>
+      <div><small>Category</small><b>${escapeHtml(result.category)}</b></div>
+      <div><small>Budget after</small><b>${money(Math.max(result.budgetAfter,0))}</b></div>
+    </div>
+    <div class="result-policy">
+      <small>POLICY CHECK</small>
+      <ul>${riskHtml}</ul>
+    </div>
+    <div class="result-actions">
+      <button type="button" id="copilotCreate">${result.approvalRequired?"Create approval request":"Create transaction"}</button>
+      <button type="button" id="copilotClear">Clear</button>
+    </div>`;
+  $("#copilotResult").classList.add("visible");
+
+  $("#copilotClear").addEventListener("click",()=>{ $("#copilotInput").value=""; $("#copilotResult").classList.remove("visible"); $("#copilotResult").innerHTML=""; });
+
+  $("#copilotCreate").addEventListener("click",()=>{
+    if(result.amount===null){showToast("Add a dollar amount first");return;}
+    if(result.approvalRequired){
+      state.approvals.unshift({
+        id:Date.now(),
+        merchant:result.merchant,
+        purpose:result.raw,
+        requester:"Neha Mahesh",
+        team:"Engineering",
+        amount:result.amount,
+        policy:result.risk.join(" · ") || "Within policy",
+        risk:result.tone==="good"?"ok":"warn"
+      });
+      saveState();renderAll();showTab("approvals");showToast("Approval request created");
+    }else{
+      state.transactions.unshift({
+        id:Date.now(),
+        icon:(result.merchant[0]||"$").toUpperCase(),
+        merchant:result.merchant,
+        category:result.category,
+        date:"Just now",
+        amount:result.amount,
+        receipt:!result.receiptRequired,
+        status:result.receiptRequired?"Needs receipt":"Auto-approved",
+        cardholder:"Neha Mahesh",
+        policy:result.risk.join(" · ") || "Within policy"
+      });
+      saveState();renderAll();showTab("activity");showToast("Transaction created");
+    }
+  });
+}
+
+$("#copilotForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const text=$("#copilotInput").value.trim();
+  if(text.length<4){showToast("Describe the spend first");return;}
+  renderCopilotResult(analyzeSpendText(text));
+});
+$("[data-example]").forEach(btn=>btn.addEventListener("click",()=>{
+  $("#copilotInput").value=btn.dataset.example;
+  renderCopilotResult(analyzeSpendText(btn.dataset.example));
+}));
+
+renderAll();
   showToast(approved?"Request approved and added to activity":"Request denied");
 }
 
