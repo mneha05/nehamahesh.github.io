@@ -33,13 +33,31 @@
           <div class="app-header"><div><small>OCTOBER SPEND</small><h2 id="totalSpend">$18,420.62</h2></div><div class="avatar">NM</div></div>
           <div class="budget-card"><div><span>Engineering budget</span><strong id="budgetPct">68%</strong></div><div class="progress"><i id="progressBar"></i></div><small><span id="remaining">$8,579 remaining</span><span>$27,000</span></small></div>
           <div class="segmented"><button class="active" data-tab="activity">Activity</button><button data-tab="approvals">Approvals <b>3</b></button><button data-tab="insights">Insights</button></div>
-          <div class="tab-panel active" id="activity"><div class="section-title"><b>Recent</b><span>See all</span></div><div class="tx-list" id="txList"></div></div>
-          <div class="tab-panel" id="approvals">
-            <div class="approval" data-id="0"><div class="approval-top"><div class="merchant-icon">◈</div><div><b>Figma</b><span>Team plan upgrade</span></div><strong>$420</strong></div><p>Requested by Maya Chen · Design</p><div class="policy ok">✓ Within software policy</div><div class="approve-actions"><button class="deny">Deny</button><button class="approve">Approve</button></div></div>
-            <div class="approval" data-id="1"><div class="approval-top"><div class="merchant-icon">✦</div><div><b>United</b><span>Customer onsite · NYC</span></div><strong>$812</strong></div><p>Requested by Alex Kim · Sales</p><div class="policy warn">! Fare is 18% over route median</div><div class="approve-actions"><button class="deny">Deny</button><button class="approve">Approve</button></div></div>
+          <div class="tab-panel active" id="activity">
+            <div class="activity-tools">
+              <input id="searchTx" type="search" placeholder="Search spend" aria-label="Search transactions">
+              <button id="addExpenseBtn" class="mini-action">＋</button>
+            </div>
+            <div class="filter-row"><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="receipt">Needs receipt</button><button class="filter" data-filter="travel">Travel</button></div>
+            <div class="section-title"><b>Recent activity</b><span id="txCount"></span></div>
+            <div class="tx-list" id="txList"></div>
           </div>
-          <div class="tab-panel" id="insights"><div class="insight-hero"><small>THIS MONTH</small><strong>↓ 11.8%</strong><span>vs. September</span></div><div class="chart" id="chart"></div><div class="insight-row"><span><i class="dot software"></i>Software</span><b>$7.8k</b></div><div class="insight-row"><span><i class="dot travel"></i>Travel</span><b>$4.3k</b></div><div class="insight-row"><span><i class="dot cloud"></i>Cloud</span><b>$3.9k</b></div></div>
-          <nav class="bottom-nav"><button class="active">⌂<span>Home</span></button><button id="scanBtn">▣<span>Receipt</span></button><button>◎<span>Cards</span></button><button>⋯<span>More</span></button></nav>
+          <div class="tab-panel" id="approvals"><div id="approvalList"></div><div class="empty-state" id="approvalEmpty">✓<b>All caught up</b><span>No requests need review.</span></div></div>
+          <div class="tab-panel" id="insights">
+            <div class="insight-hero"><small>THIS MONTH</small><strong id="monthChange">↓ 11.8%</strong><span>vs. September</span></div>
+            <div class="chart" id="chart"></div><div id="categoryBreakdown"></div>
+          </div>
+          <div class="tab-panel" id="cards">
+            <div class="virtual-card" id="virtualCard"><small>LEDGERLENS BUSINESS</small><b>•••• 4242</b><span>NEHA MAHESH</span><strong id="cardStatus">ACTIVE</strong></div>
+            <div class="card-control"><div><b>Freeze card</b><span>Decline new purchases instantly</span></div><label class="switch"><input type="checkbox" id="freezeCard"><i></i></label></div>
+            <label class="limit-control"><span>Monthly card limit</span><div><b>$</b><input id="cardLimit" type="number" min="100" step="100" value="5000"></div></label>
+            <button id="saveCard" class="wide-dark">Save card controls</button>
+          </div>
+          <div class="tab-panel" id="more">
+            <button id="exportCsv" class="menu-row"><span>⇩</span><div><b>Export transactions</b><small>Download a CSV of current activity</small></div></button>
+            <button id="resetDemo" class="menu-row danger-row"><span>↺</span><div><b>Reset demo data</b><small>Restore the original workspace</small></div></button>
+          </div>
+          <nav class="bottom-nav"><button class="active" data-nav="home">⌂<span>Home</span></button><button id="scanBtn">▣<span>Receipt</span></button><button data-nav="cards">◎<span>Cards</span></button><button data-nav="more">⋯<span>More</span></button></nav>
         </div></div>
       </div>
     </section>
@@ -68,7 +86,9 @@
     </section>
     <section class="closing"><small>LEDGERLENS</small><h2>Mobile spend operations without the operational drag.</h2><a href="https://github.com/mneha05/nehamahesh.github.io/tree/main/projects/ledgerlens" target="_blank" rel="noreferrer">Explore the implementation ↗</a></section>
   </main>
-  <div class="sheet" id="receiptSheet" aria-hidden="true"><div class="sheet-backdrop"></div><div class="sheet-card"><div class="grabber"></div><div class="scan-frame"><div class="receipt-paper"><b>BLUE BOTTLE</b><span>10/03/2026</span><hr><span>Coffee meeting</span><strong>$18.72</strong></div><div class="scan-line"></div></div><h3>Receipt matched</h3><p>LedgerLens matched this receipt to today’s Blue Bottle transaction with 98% confidence.</p><button id="doneScan">Attach receipt</button></div></div>
+  <div class="sheet" id="receiptSheet" aria-hidden="true"><div class="sheet-backdrop" data-close="receiptSheet"></div><div class="sheet-card"><div class="grabber"></div><div class="scan-frame"><div class="receipt-paper"><b id="receiptMerchant">RECEIPT</b><span id="receiptDate">10/03/2026</span><hr><span>Expense</span><strong id="receiptAmount">$0.00</strong></div><div class="scan-line"></div></div><h3 id="receiptTitle">Match a receipt</h3><p id="receiptCopy">Choose a transaction that still needs a receipt.</p><select id="receiptSelect"></select><button id="doneScan">Attach receipt</button></div></div>
+  <div class="sheet" id="expenseSheet" aria-hidden="true"><div class="sheet-backdrop" data-close="expenseSheet"></div><form class="sheet-card form-sheet" id="expenseForm"><div class="grabber"></div><h3>Add an expense</h3><label>Merchant<input name="merchant" required placeholder="e.g. Notion"></label><label>Amount<input name="amount" required type="number" min="0.01" step="0.01" placeholder="49.00"></label><label>Category<select name="category"><option>Software</option><option>Travel</option><option>Cloud</option><option>Meals</option></select></label><label class="check-line"><input name="receipt" type="checkbox"> Receipt attached</label><button type="submit">Create transaction</button></form></div>
+  <div class="sheet" id="detailSheet" aria-hidden="true"><div class="sheet-backdrop" data-close="detailSheet"></div><div class="sheet-card detail-card"><div class="grabber"></div><div id="detailContent"></div><button data-close="detailSheet">Done</button></div></div>
   <div class="toast" id="toast">Approved</div>
   <script src="app.js"></script>
 </body>
