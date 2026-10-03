@@ -43,6 +43,32 @@
       <h2>Projects</h2>
       <div class="grid">
         <article class="card featured">
+          <h3>LedgerLens <span class="fx-badge">iOS · SwiftUI</span></h3>
+          <p class="tech">Swift 6 • SwiftUI • Observation / MVVM • async/await • URLSession • Swift Charts • XCTest • iOS 17+</p>
+          <p>
+            An <strong>iPhone-first spend operations app</strong> that puts card activity, receipt capture,
+            policy context, approval queues, and budget intelligence into one fast mobile workflow.
+            The native client uses protocol-injected services and structured concurrency; the public
+            browser demo mirrors the product flow so the interaction design can be evaluated instantly.
+          </p>
+          <div class="fx-stats">
+            <div class="fx-stat"><b>SwiftUI</b><span>native iOS interface</span></div>
+            <div class="fx-stat"><b>MVVM</b><span>@Observable state + DI</span></div>
+            <div class="fx-stat"><b>async/await</b><span>concurrent dashboard loading</span></div>
+            <div class="fx-stat"><b>XCTest</b><span>deterministic state coverage</span></div>
+          </div>
+          <ul>
+            <li><strong>Approval workflow</strong> surfaces requester, amount, purpose, and policy signal before approve/deny actions, with per-request asynchronous state.</li>
+            <li><strong>Receipt workflow</strong> models capture → match → attach and updates only the selected transaction's receipt state.</li>
+            <li><strong>Network-ready architecture</strong> isolates REST calls behind a <code>SpendService</code> protocol using <code>URLSession</code>, <code>Codable</code>, and typed errors.</li>
+            <li><strong>Interactive public demo</strong> includes live tabs, approval actions, spend charts, budget progress, and simulated receipt matching.</li>
+          </ul>
+          <p class="links">
+            <a href="projects/ledgerlens/" target="_blank" rel="noopener">Live Demo</a>
+            · <a href="https://github.com/mneha05/nehamahesh.github.io/tree/main/projects/ledgerlens" target="_blank" rel="noopener">Source</a>
+          </p>
+        </article>
+        <article class="card featured">
           <h3>hetero-serve <span class="fx-badge">Featured</span></h3>
           <p class="tech">CUDA • C++ • WMMA / tensor cores • Nsight Compute • PyTorch • NumPy • paged attention • NCCL • asyncio • Docker</p>
 
