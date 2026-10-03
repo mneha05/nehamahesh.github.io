@@ -32,6 +32,15 @@
           <div class="status"><span>9:41</span><span>●●● 5G ▰</span></div>
           <div class="app-header"><div><small>OCTOBER SPEND</small><h2 id="totalSpend">$18,420.62</h2></div><div class="avatar">NM</div></div>
           <div class="budget-card"><div><span>Engineering budget</span><strong id="budgetPct">68%</strong></div><div class="progress"><i id="progressBar"></i></div><small><span id="remaining">$8,579 remaining</span><span>$27,000</span></small></div>
+          <div class="copilot-card">
+            <div class="copilot-head"><div><small>SPEND COPILOT</small><b>Describe what you need</b></div><span>⌁</span></div>
+            <form id="copilotForm">
+              <textarea id="copilotInput" rows="2" placeholder="e.g. I need $850 for a United flight to NYC for a customer meeting next week"></textarea>
+              <div class="copilot-examples"><button type="button" data-example="I need $850 for a United flight to NYC for a customer meeting next week">Flight</button><button type="button" data-example="Buy a $79 Figma seat for our new designer">Software</button><button type="button" data-example="Team dinner for 6 people, around $240">Meal</button></div>
+              <button class="analyze-btn" type="submit">Analyze spend →</button>
+            </form>
+            <div id="copilotResult" class="copilot-result" aria-live="polite"></div>
+          </div>
           <div class="segmented"><button class="active" data-tab="activity">Activity</button><button data-tab="approvals">Approvals <b>3</b></button><button data-tab="insights">Insights</button></div>
           <div class="tab-panel active" id="activity">
             <div class="activity-tools">
