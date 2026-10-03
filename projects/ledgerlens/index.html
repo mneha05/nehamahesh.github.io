@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="description" content="LedgerLens — a SwiftUI-first spend operations app for cards, receipts, policy review, approvals, and budget insights." />
+  <title>LedgerLens — Spend operations, redesigned</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="noise"></div>
+  <header class="topbar">
+    <a class="brand" href="#top"><span class="brand-mark">L</span>LedgerLens</a>
+    <nav><a href="#product">Product</a><a href="#architecture">Architecture</a><a href="#native">SwiftUI</a></nav>
+    <a class="ghost" href="https://github.com/mneha05/nehamahesh.github.io/tree/main/projects/ledgerlens" target="_blank" rel="noreferrer">View source ↗</a>
+  </header>
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span></span> iOS finance operations prototype</div>
+        <h1>Every company expense,<br><em>finally in focus.</em></h1>
+        <p>LedgerLens turns card activity, receipts, approvals, budgets, and policy checks into one fast mobile workflow. The native app is built in Swift + SwiftUI; this browser demo mirrors the same interaction model so anyone can try it instantly.</p>
+        <div class="hero-actions"><button class="primary" data-scroll="product">Try the interactive demo</button><a class="secondary" href="#architecture">See the system design</a></div>
+        <div class="proof"><div><strong>SwiftUI</strong><span>native interface</span></div><div><strong>async/await</strong><span>network layer</span></div><div><strong>MVVM</strong><span>testable state</span></div><div><strong>Charts</strong><span>spend insights</span></div></div>
+      </div>
+      <div class="phone-shell" aria-label="Interactive LedgerLens phone preview">
+        <div class="phone"><div class="island"></div><div class="screen">
+          <div class="status"><span>9:41</span><span>●●● 5G ▰</span></div>
+          <div class="app-header"><div><small>OCTOBER SPEND</small><h2 id="totalSpend">$18,420.62</h2></div><div class="avatar">NM</div></div>
+          <div class="budget-card"><div><span>Engineering budget</span><strong id="budgetPct">68%</strong></div><div class="progress"><i id="progressBar"></i></div><small><span id="remaining">$8,579 remaining</span><span>$27,000</span></small></div>
+          <div class="segmented"><button class="active" data-tab="activity">Activity</button><button data-tab="approvals">Approvals <b>3</b></button><button data-tab="insights">Insights</button></div>
+          <div class="tab-panel active" id="activity"><div class="section-title"><b>Recent</b><span>See all</span></div><div class="tx-list" id="txList"></div></div>
+          <div class="tab-panel" id="approvals">
+            <div class="approval" data-id="0"><div class="approval-top"><div class="merchant-icon">◈</div><div><b>Figma</b><span>Team plan upgrade</span></div><strong>$420</strong></div><p>Requested by Maya Chen · Design</p><div class="policy ok">✓ Within software policy</div><div class="approve-actions"><button class="deny">Deny</button><button class="approve">Approve</button></div></div>
+            <div class="approval" data-id="1"><div class="approval-top"><div class="merchant-icon">✦</div><div><b>United</b><span>Customer onsite · NYC</span></div><strong>$812</strong></div><p>Requested by Alex Kim · Sales</p><div class="policy warn">! Fare is 18% over route median</div><div class="approve-actions"><button class="deny">Deny</button><button class="approve">Approve</button></div></div>
+          </div>
+          <div class="tab-panel" id="insights"><div class="insight-hero"><small>THIS MONTH</small><strong>↓ 11.8%</strong><span>vs. September</span></div><div class="chart" id="chart"></div><div class="insight-row"><span><i class="dot software"></i>Software</span><b>$7.8k</b></div><div class="insight-row"><span><i class="dot travel"></i>Travel</span><b>$4.3k</b></div><div class="insight-row"><span><i class="dot cloud"></i>Cloud</span><b>$3.9k</b></div></div>
+          <nav class="bottom-nav"><button class="active">⌂<span>Home</span></button><button id="scanBtn">▣<span>Receipt</span></button><button>◎<span>Cards</span></button><button>⋯<span>More</span></button></nav>
+        </div></div>
+      </div>
+    </section>
+    <section class="feature-strip" id="product">
+      <div class="feature-copy"><div class="eyebrow"><span></span> Product walkthrough</div><h2>Built around the moment finance work actually happens.</h2><p>Tap a transaction to inspect policy context. Approve requests without leaving the queue. Use the receipt action to simulate capture and auto-match. Every interaction updates state immediately.</p></div>
+      <div class="feature-grid"><article><div class="num">01</div><h3>Transaction intelligence</h3><p>Merchant, category, receipt state, cardholder, and policy status in one glance.</p></article><article><div class="num">02</div><h3>Fast approvals</h3><p>Context-first approval cards surface the reason, owner, amount, and policy signal before the action.</p></article><article><div class="num">03</div><h3>Budget awareness</h3><p>Progressive disclosure keeps spend limits visible without turning the home screen into a dashboard dump.</p></article><article><div class="num">04</div><h3>Receipt capture</h3><p>A simulated OCR flow demonstrates the mobile-first handoff from camera capture to matched transaction.</p></article></div>
+    </section>
+    <section class="architecture" id="architecture"><div class="section-head"><div><div class="eyebrow"><span></span> Architecture</div><h2>Native-first, testable, deliberately boring where it should be.</h2></div><p>The app keeps views declarative, isolates asynchronous work in services, and exposes deterministic state through observable view models.</p></div><img src="assets/architecture.svg" alt="LedgerLens MVVM architecture diagram" /></section>
+    <section class="native" id="native"><div class="native-copy"><div class="eyebrow"><span></span> Swift + SwiftUI</div><h2>The browser is only the demo surface. The product is native.</h2><p>The iOS implementation uses NavigationStack, Swift Charts, async/await networking, protocol-based dependency injection, @Observable view models, Codable models, and XCTest coverage for loading and approval flows.</p><div class="chips"><span>Swift 6</span><span>SwiftUI</span><span>Swift Charts</span><span>URLSession</span><span>async/await</span><span>MVVM</span><span>XCTest</span></div></div>
+      <pre><code><span class="kw">@MainActor</span>
+<span class="kw">@Observable</span>
+<span class="kw">final class</span> DashboardViewModel {
+  <span class="kw">private let</span> service: SpendService
+  <span class="kw">var</span> transactions: [Transaction] = []
+
+  <span class="kw">func</span> refresh() <span class="kw">async</span> {
+    state = .loading
+    <span class="kw">do</span> {
+      transactions = <span class="kw">try await</span> service.transactions()
+      state = .loaded
+    } <span class="kw">catch</span> {
+      state = .failed(error.localizedDescription)
+    }
+  }
+}</code></pre>
+    </section>
+    <section class="closing"><small>LEDGERLENS</small><h2>Mobile spend operations without the operational drag.</h2><a href="https://github.com/mneha05/nehamahesh.github.io/tree/main/projects/ledgerlens" target="_blank" rel="noreferrer">Explore the implementation ↗</a></section>
+  </main>
+  <div class="sheet" id="receiptSheet" aria-hidden="true"><div class="sheet-backdrop"></div><div class="sheet-card"><div class="grabber"></div><div class="scan-frame"><div class="receipt-paper"><b>BLUE BOTTLE</b><span>10/03/2026</span><hr><span>Coffee meeting</span><strong>$18.72</strong></div><div class="scan-line"></div></div><h3>Receipt matched</h3><p>LedgerLens matched this receipt to today’s Blue Bottle transaction with 98% confidence.</p><button id="doneScan">Attach receipt</button></div></div>
+  <div class="toast" id="toast">Approved</div>
+  <script src="app.js"></script>
+</body>
+</html>
