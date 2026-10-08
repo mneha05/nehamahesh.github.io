@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0c101a">
+<title>KV Cache Lab — Interactive LLM Memory Visualizer</title>
+<meta name="description" content="Explore transformer KV-cache memory, paged allocation and decode token growth in an interactive, dependency-free visualization.">
+<style>
+:root{color-scheme:dark;--bg:#0b0f18;--panel:#131a28;--panel2:#1b2537;--line:#29364a;--fg:#eef3ff;--muted:#9aaac3;--a:#82e3cc;--b:#a995ff;--c:#ffbd84}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 75% -20%,#253356 0%,transparent 52%),var(--bg);font:15px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--fg)}
+.wrap{max-width:1200px;margin:auto;padding:35px 24px 65px}header{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:37px;flex-wrap:wrap}
+.logo{font-weight:800;letter-spacing:-.03em;font-size:18px}.logo span{color:var(--a)}a{color:var(--a);text-decoration:none}.tag{display:inline-block;color:var(--a);border:1px solid #417e77;border-radius:30px;padding:4px 12px;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+h1{font-size:clamp(38px,6vw,69px);line-height:1.07;letter-spacing:-.065em;margin:17px 0}.intro{font-size:17px;color:var(--muted);max-width:650px;margin-bottom:33px}
+.layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:20px}.panel{border:1px solid var(--line);background:linear-gradient(135deg,#162033dd,#111825ed);border-radius:18px;padding:23px;min-width:0}.panel h2{font-size:17px;margin:0 0 20px;letter-spacing:-.02em}.field{margin-bottom:23px}.field .fieldhead{display:flex;justify-content:space-between;gap:8px;margin-bottom:10px;color:#cfdaec;font-size:14px}.field output{font-variant-numeric:tabular-nums;color:var(--a);font-weight:700}
+input[type=range]{width:100%;accent-color:var(--a);cursor:pointer}.hint{color:var(--muted);font-size:12px;margin-top:8px}
+select{width:100%;padding:10px;border-radius:9px;background:#192439;color:var(--fg);border:1px solid #34445d}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.stat{background:#101827;border:1px solid var(--line);border-radius:13px;padding:15px;min-width:0}.stat small{color:var(--muted);display:block}.stat strong{display:block;font-size:clamp(21px,2.7vw,31px);letter-spacing:-.04em;margin-top:4px;font-variant-numeric:tabular-nums}.stat:nth-child(2) strong{color:var(--a)}.stat:nth-child(3) strong{color:var(--b)}
+.visual{margin-top:17px}.sectionlabel{font-size:12px;letter-spacing:.11em;color:var(--muted);font-weight:700;text-transform:uppercase;margin:0 0 14px}.legend{display:flex;gap:15px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin:14px 0}.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}.blocks{display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:5px}.block{aspect-ratio:1.3;border-radius:5px;background:#26354d;border:1px solid #455775;transition:background .2s}.block.full{background:var(--a);border-color:#b5fff0}.block.partial{background:linear-gradient(90deg,var(--a) 55%,#26354d 55%)}.block.free{opacity:.55}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:17px;margin-top:20px}.info{border-radius:13px;background:#0f1726;padding:15px;border:1px solid var(--line)}.info b{font-size:14px}.info p{color:var(--muted);font-size:13px;margin:6px 0 0}.meter{height:10px;border-radius:30px;overflow:hidden;background:#27354d;margin:13px 0 4px}.meter div{height:100%;background:linear-gradient(90deg,var(--a),var(--b));width:0%;transition:width .2s}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}button{border:1px solid #3a5067;border-radius:10px;color:var(--fg);background:#26344b;padding:11px 17px;cursor:pointer;font-weight:700}button.primary{background:var(--a);color:#09231e;border:0}button:disabled{opacity:.55;cursor:default}
+footer{color:var(--muted);font-size:13px;margin-top:40px;max-width:900px}.formula{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#d4e2fb;background:#0d1626;border:1px solid var(--line);padding:13px;border-radius:10px;overflow-wrap:anywhere;font-size:12px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,1fr)}}@media(max-width:560px){.stats{grid-template-columns:1fr}.metrics{grid-template-columns:1fr}.wrap{padding:21px 14px}.blocks{gap:3px}}
+</style>
+</head>
+<body><div class="wrap">
+<header><div class="logo">◈ <span>KV</span> CACHE LAB</div><a href="https://github.com/mneha05/nehamahesh.github.io/tree/main/lab/kv-cache">View source ↗</a></header>
+<main>
+<div class="tag">LLM inference · Systems playground</div>
+<h1>Where do the<br>tokens go?</h1>
+<p class="intro">A hands-on model of transformer KV-cache memory. Change your inference workload, simulate decoding, and watch paged allocation grow one token at a time.</p>
+<div class="layout">
+<aside class="panel">
+<h2>01 / Workload controls</h2>
+<div class="field"><div class="fieldhead"><label for="context">Prompt tokens / request</label><output id="contextOut"></output></div><input id="context" type="range" min="128" max="8192" step="128" value="2048"></div>
+<div class="field"><div class="fieldhead"><label for="batch">Concurrent requests</label><output id="batchOut"></output></div><input id="batch" type="range" min="1" max="32" step="1" value="8"></div>
+<div class="field"><div class="fieldhead"><label for="layers">Transformer layers</label><output id="layersOut"></output></div><input id="layers" type="range" min="8" max="80" step="8" value="32"></div>
+<div class="field"><div class="fieldhead"><label for="heads">KV heads</label><output id="headsOut"></output></div><input id="heads" type="range" min="1" max="32" step="1" value="8"></div>
+<div class="field"><div class="fieldhead"><label for="dim">Head dimension</label><output id="dimOut"></output></div><input id="dim" type="range" min="32" max="256" step="32" value="128"></div>
+<div class="field"><div class="fieldhead"><label for="precision">Cache precision</label></div><select id="precision"><option value="2">FP16 / BF16 (2 bytes)</option><option value="1">FP8 / INT8 (1 byte)</option><option value="4">FP32 (4 bytes)</option></select></div>
+<div class="field"><div class="fieldhead"><label for="page">Page size</label></div><select id="page"><option value="16">16 tokens</option><option value="32">32 tokens</option><option value="64">64 tokens</option><option value="8">8 tokens</option></select><div class="hint">Fixed-size blocks, as in paged KV cache.</div></div>
+<button id="reset">Reset simulation</button>
+</aside>
+<section class="panel">
+<h2>02 / Memory model</h2>
+<div class="stats">
+<div class="stat"><small>Useful KV data</small><strong id="useful">—</strong></div>
+<div class="stat"><small>Allocated KV</small><strong id="allocated">—</strong></div>
+<div class="stat"><small>Internal waste</small><strong id="waste">—</strong></div>
+</div>
+<div class="visual">
+<p class="sectionlabel">Page allocation · illustrative sample</p>
+<div id="blocks" class="blocks" role="img" aria-label="Illustrative allocated pages"></div>
+<div class="legend"><span><i class="dot" style="background:var(--a)"></i>Used</span><span><i class="dot" style="background:linear-gradient(90deg,var(--a) 55%,#26354d 55%)"></i>Part-filled</span><span><i class="dot" style="background:#26354d"></i>Unallocated</span></div>
+<div class="hint" id="sampleNote"></div>
+</div>
+<div class="metrics">
+<div class="info"><b>Page utilization</b><div class="meter"><div id="meterFill"></div></div><p id="utilization"></p></div>
+<div class="info"><b>Generated token count</b><p id="generated" style="font-size:23px;color:var(--c);font-weight:800;margin:8px 0"></p><p>Additional output tokens per request</p></div>
+</div>
+<div class="actions"><button id="step" class="primary">+ 1 decode token</button><button id="play">▶ Auto-decode</button><button id="plus">+ 128 tokens</button></div>
+<p class="sectionlabel" style="margin-top:29px">Memory math</p><div class="formula" id="formula"></div>
+</section>
+</div>
+<footer><b>What this models.</b> Each token stores a key and a value for every layer and KV head. Physical blocks are allocated in fixed-sized token pages for each request. Allocation slack is counted, but this model does not measure GPU execution speed, kernel overhead, model weights, allocator metadata, or prefix sharing. The block diagram shows a small illustrative subset, not every page in VRAM. Calculations use binary MiB/GiB units.</footer>
+</main></div>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const inputs=['context','batch','layers','heads','dim','precision','page'];
+let generated=0,timer=null;
+const fmt=n=>n.toLocaleString('en-US');
+const size=n=>n>=1024**3?(n/1024**3).toFixed(2)+' GiB':(n/1024**2).toFixed(1)+' MiB';
+function draw(){
+ const v=id=>Number($(id).value);
+ const context=v('context'),batch=v('batch'),layers=v('layers'),heads=v('heads'),dim=v('dim'),bytes=v('precision'),page=v('page');
+ const perToken=2*layers*heads*dim*bytes;
+ const tokens=context+generated;
+ const pages=Math.ceil(tokens/page);
+ const useful=perToken*tokens*batch,allocated=perToken*pages*page*batch,waste=allocated-useful;
+ const utilization=100*useful/allocated;
+ for(const id of ['context','batch','layers','heads','dim'])$(id+'Out').textContent=fmt(v(id));
+ $('useful').textContent=size(useful);$('allocated').textContent=size(allocated);$('waste').textContent=size(waste);
+ $('meterFill').style.width=utilization+'%';
+ $('utilization').textContent=utilization.toFixed(2)+'% · '+fmt(pages*batch)+' physical pages';
+ $('generated').textContent='+'+fmt(generated);
+ $('formula').textContent='2 (K + V) × '+layers+' layers × '+heads+' KV heads × '+dim+' dimensions × '+bytes+' B × '+fmt(tokens)+' tokens × '+batch+' requests = '+size(useful)+' useful data';
+ const grid=$('blocks');grid.replaceChildren();
+ const count=64;const visiblePages=Math.min(pages,64);const partial=tokens%page;
+ for(let i=0;i<count;i++){const cell=document.createElement('div');cell.className='block '+(i>=visiblePages?'free':i===visiblePages-1&&partial?'partial':'full');grid.appendChild(cell);}
+ $('sampleNote').textContent='First '+fmt(visiblePages)+' of '+fmt(pages)+' pages for one request; '+fmt(page)+' token slots per page. '+(pages>64?'Additional pages are not shown.':'');
+}
+function stop(){if(timer!==null){clearInterval(timer);timer=null}$('play').textContent='▶ Auto-decode'}
+for(const id of inputs)$(id).addEventListener('input',draw);
+$('step').addEventListener('click',()=>{generated++;draw()});
+$('plus').addEventListener('click',()=>{generated+=128;draw()});
+$('reset').addEventListener('click',()=>{stop();generated=0;draw()});
+$('play').addEventListener('click',()=>{if(timer!==null){stop();return}$('play').textContent='Ⅱ Pause';timer=setInterval(()=>{generated++;draw();if(generated>=16384)stop()},180)});
+draw();
+</script>
+</body></html>
